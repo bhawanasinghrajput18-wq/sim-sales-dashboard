@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sales & Operations Dashboard</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+  <div class="monitor-container">
+
+    <!-- HEADER -->
+    <header class="monitor-header">
+      <div class="header-left">
+        <h1 class="monitor-title"><i class="fa-solid fa-chart-line"></i> eSIM Sales Monitor</h1>
+        <span class="api-status"><span class="status-dot"></span> Live API</span>
+      </div>
+
+      <div class="header-right">
+        <!-- Date Selector -->
+        <div class="date-filter">
+          <label for="datePicker">Date:</label>
+          <input type="date" id="datePicker" min="2026-05-01" max="2026-05-31" value="2026-05-31">
+        </div>
+
+        <!-- Refresh Button -->
+        <button id="refreshBtn" class="simple-btn">
+          <i class="fa-solid fa-arrows-rotate"></i> Refresh
+        </button>
+
+        <!-- USER NAME BADGE -->
+        <div class="user-name-box">
+          <i class="fa-regular fa-user"></i>
+          <span>Dashboard</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN MONITORING CONTENT -->
+    <main class="monitor-main">
+
+      <!-- TOP KPI CARDS GRID -->
+      <section class="kpi-grid">
+        <!-- Card 1: Selected Date Revenue -->
+        <div class="kpi-card">
+          <div class="kpi-title" id="todayRevLabel">Selected Date Revenue</div>
+          <div class="kpi-value" id="todayRevenue">₹0.00</div>
+          <div class="kpi-sub">
+            <span class="trend-badge positive" id="todayRevTrend">
+              <span id="todayRevPercent">+0%</span>
+            </span>
+            <span class="sub-text">vs prev month same day</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Selected Date Orders -->
+        <div class="kpi-card">
+          <div class="kpi-title" id="todayOrdersLabel">Selected Date Orders</div>
+          <div class="kpi-value" id="todayOrders">0</div>
+          <div class="kpi-sub">
+            <span class="trend-badge positive" id="todayOrdersTrend">
+              <span id="todayOrdersPercent">+0%</span>
+            </span>
+            <span class="sub-text">AOV: <strong id="todayAOV">₹0</strong></span>
+          </div>
+        </div>
+
+        <!-- Card 3: MTD Revenue -->
+        <div class="kpi-card">
+          <div class="kpi-title">MTD Revenue (May 2026)</div>
+          <div class="kpi-value" id="mtdRevenue">₹0.00</div>
+          <div class="kpi-sub">
+            <span class="trend-badge positive">+70.7%</span>
+            <span class="sub-text">Total Orders: <strong id="mtdOrders">0</strong></span>
+          </div>
+        </div>
+
+        <!-- Card 4: Top Performer -->
+        <div class="kpi-card">
+          <div class="kpi-title">Top Performer</div>
+          <div class="kpi-value" id="performerName">--</div>
+          <div class="kpi-sub">
+            <span class="target-tag" id="performerTarget">0% Target</span>
+            <span class="sub-text" id="performerMtdRev">MTD: ₹0</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ROW 1: DAILY REVENUE TRENDS (LINE CHART) -->
+      <section class="chart-block">
+        <div class="block-header">
+          <h2>Daily Revenue & Order Trends</h2>
+          <div class="toggle-group">
+            <button class="toggle-btn active" data-metric="both">All</button>
+            <button class="toggle-btn" data-metric="revenue">Revenue</button>
+            <button class="toggle-btn" data-metric="orders">Orders</button>
+          </div>
+        </div>
+        <div class="chart-box line-box">
+          <canvas id="dailyRevenueChart"></canvas>
+        </div>
+      </section>
+
+      <!-- ROW 2: PIE CHART & BAR GRAPH -->
+      <section class="charts-grid">
+        <!-- Top eSIM Destinations -->
+        <div class="chart-block">
+          <div class="block-header">
+            <h2>Top Destinations</h2>
+            <select id="simTypeFilter" class="simple-select">
+              <option value="all">All Plans</option>
+              <option value="esim">eSIM</option>
+              <option value="plastic">Plastic SIM</option>
+            </select>
+          </div>
+          <div class="chart-box donut-box">
+            <canvas id="topDestinationsChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Monthly Performance -->
+        <div class="chart-block">
+          <div class="block-header">
+            <h2>Monthly Performance (Jan - May 2026)</h2>
+          </div>
+          <div class="chart-box bar-box">
+            <canvas id="monthlyPerformanceChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ROW 3: SALES LEADERBOARD -->
+      <section class="table-block">
+        <div class="block-header">
+          <h2>Sales Team Leaderboard</h2>
+          <div class="table-controls">
+            <input type="text" id="searchLeaderboard" placeholder="Search representative..." class="simple-input">
+            <select id="sortLeaderboard" class="simple-select">
+              <option value="target_percent">Sort: Target %</option>
+              <option value="mtd_revenue">Sort: MTD Revenue</option>
+              <option value="day_revenue">Sort: Day Revenue</option>
+              <option value="mtd_orders">Sort: MTD Orders</option>
+              <option value="arpu">Sort: ARPU</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="monitor-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Sales Rep</th>
+                <th>Day Orders</th>
+                <th>Day Revenue</th>
+                <th>MTD Orders</th>
+                <th>MTD Revenue</th>
+                <th>ARPU</th>
+                <th>Target Achieved</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboardTbody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="monitor-footer">
+      <p>Operations Monitoring Interface &bull; Supabase RPC API</p>
+    </footer>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
